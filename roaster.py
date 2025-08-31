@@ -294,23 +294,35 @@ def main():
         roast_html = roast.replace('**', '<strong>').replace('**', '</strong>')
         roast_html = roast_html.replace('*', '<em>').replace('*', '</em>')
         roast_html = roast_html.replace('\n', '<br>')
+
+        # modify the text and background color based on the system theme
+        theme = st.get_option("theme.base")
+
+        # Choose colors based on theme
+        if theme == "dark":
+            bg_color = "#2C3E50"
+            text_color = "#FFFFFF"
+        else:
+            bg_color = "#F5F5F5"
+            text_color = "#111111"
         
         st.markdown(
-            f"""
-            <div style="
-                background-color: #191970;
-                padding: 25px;
-                border-radius: 10px;
-                border-left: 5px solid #ff4b4b;
-                margin: 20px 0;
-                font-size: 1.1rem;
-                line-height: 1.6;
-            ">
-                {roast_html}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        f"""
+        <div style="
+            background-color: {bg_color};
+            color: {text_color};
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #ff4b4b;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        ">
+            {roast_html}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
         
         # Show some stats
         with st.expander("📊 Profile Statistics"):
