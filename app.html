@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Profile Roaster 🔥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        .roast-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .roast-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .roast-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff6b6b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .roast-box {
+            background: #f8f9fa;
+            border-left: 5px solid #ff6b6b;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 GitHub Profile Roaster</h1>
+            <p>Get constructively roasted based on your GitHub profile!</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <label for="github-input">GitHub URL or Username:</label>
+                <div class="input-group">
+                    <input type="text" id="github-input" placeholder="https://github.com/username or just 'username'">
+                    <button class="roast-btn" onclick="startRoast()">🔥 ROAST ME!</button>
+                </div>
+                <small style="color: #666;">Enter a GitHub profile URL or just the username</small>
+            </div>
+            
+            <div class="error" id="error-message"></div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p id="loading-text">Fetching GitHub data...</p>
+            </div>
+            
+            <div class="result" id="result">
+                <h3>🔥 Your Roast</h3>
+                <p><strong>Target:</strong> <span id="target-user"></span></p>
+                <div class="roast-box" id="roast-content"></div>
+                
+                <h4>📊 Profile Statistics</h4>
+                <div class="stats" id="stats"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            This is all in good fun! The goal is constructive feedback with humor. Keep coding and improving! 💪
+            <br>
+            Built by <a href="https://chibuikeonuba.github.io/" target="_blank">Chibuike Onuba</a> 
+        </div>
+    </div>
+
+    <script>
+        // Replace with your OpenAI API key - KEEP THIS SECRET!
+        const OPENAI_API_KEY = 'insert open api key here';
+        
+        function extractUsername(input) {
+            const patterns = [
+                /github\.com\/([^\/]+)\/?$/,
+                /github\.com\/([^\/]+)\/.*/
+            ];
+            
+            for (let pattern of patterns) {
+                const match = input.toLowerCase().match(pattern);
+                if (match) return match[1];
+            }
+            
+            return input.trim().replace('@', '');
+        }
+        
+        async function fetchGitHubData(username) {
+            try {
+                // Get profile data
+                const profileResponse = await fetch(`https://api.github.com/users/${username}`);
+                if (!profileResponse.ok) {
+                    throw new Error(`User '${username}' not found on GitHub`);
+                }
+                const profileData = await profileResponse.json();
+                
+                // Get repositories
+                const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`);
+                const reposData = await reposResponse.json();
+                
+                return {
+                    profile: {
+                        username: profileData.login,
+                        name: profileData.name || '',
+                        bio: profileData.bio || '',
+                        company: profileData.company || '',
+                        location: profileData.location || '',
+                        public_repos: profileData.public_repos,
+                        followers: profileData.followers,
+                        following: profileData.following,
+                        created_at: profileData.created_at
+                    },
+                    repositories: reposData.filter(repo => !repo.private).map(repo => ({
+                        name: repo.name,
+                        description: repo.description || '',
+                        language: repo.language || 'Unknown',
+                        stars: repo.stargazers_count,
+                        forks: repo.forks_count,
+                        is_fork: repo.fork,
+                        updated_at: repo.updated_at,
+                        size: repo.size
+                    }))
+                };
+            } catch (error) {
+                throw new Error(`Error fetching GitHub data: ${error.message}`);
+            }
+        }
+        
+        function analyzeGitHubData(data) {
+            const repos = data.repositories;
+            const totalRepos = repos.length;
+            const forkCount = repos.filter(repo => repo.is_fork).length;
+            const originalRepos = totalRepos - forkCount;
+            
+            // Language analysis
+            const languages = {};
+            repos.forEach(repo => {
+                if (repo.language && repo.language !== 'Unknown') {
+                    languages[repo.language] = (languages[repo.language] || 0) + 1;
+                }
+            });
+            
+            const topLanguages = Object.entries(languages)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .reduce((obj, [key, value]) => { obj[key] = value; return obj; }, {});
+            
+            // Other metrics
+            const genericNames = ['test', 'hello-world', 'my-project', 'untitled', 'new-project'];
+            const genericCount = repos.filter(repo => 
+                genericNames.some(name => repo.name.toLowerCase().includes(name))
+            ).length;
+            
+            const minimalRepos = repos.filter(repo => repo.size < 10).length;
+            const avgStars = repos.reduce((sum, repo) => sum + repo.stars, 0) / Math.max(totalRepos, 1);
+            const mostStarred = repos.reduce((max, repo) => repo.stars > max.stars ? repo : max, {stars: 0});
+            
+            const accountAge = new Date().getFullYear() - new Date(data.profile.created_at).getFullYear();
+            
+            return {
+                totalRepos,
+                originalRepos,
+                forkPercentage: (forkCount / Math.max(totalRepos, 1)) * 100,
+                topLanguages,
+                genericCount,
+                minimalRepos,
+                avgStars,
+                mostStarred,
+                accountAge
+            };
+        }
+        
+        async function generateRoast(githubData, analysis) {
+            const profile = githubData.profile;
+            
+            const dataSummary = `
+            Profile Analysis:
+            - Username: ${profile.username}
+            - Bio: "${profile.bio}"
+            - Company: ${profile.company}
+            - Account age: ${analysis.accountAge} years
+            - Total repositories: ${analysis.totalRepos}
+            - Original vs Forks: ${analysis.originalRepos} original, ${analysis.forkPercentage.toFixed(1)}% forks
+            - Top languages: ${Object.entries(analysis.topLanguages).map(([k, v]) => `${k} (${v} repos)`).join(', ')}
+            - Generic repository names: ${analysis.genericCount}
+            - Minimal/empty repositories: ${analysis.minimalRepos}
+            - Average stars per repo: ${analysis.avgStars.toFixed(1)}
+            - Most starred repo: ${analysis.mostStarred.name || 'None'} (${analysis.mostStarred.stars || 0} stars)
+            
+            Sample repository names: ${githubData.repositories.slice(0, 5).map(r => r.name).join(', ')}
+            `;
+            const systemPrompt = `You are a sharp-eyed GitHub profile analyst who exposes the gap between what developers claim to be and what their code actually shows. Your mission: ruthlessly compare their bio claims against cold, hard repository evidence while highlighting what they're missing from current industry trends.
+
+PRIMARY FOCUS - EXPOSE THE GAPS:
+
+1. BIO vs REALITY AUDIT: example
+- "Full-Stack Developer" with only frontend repos? Call it out.
+- "Senior Engineer" with beginner-level projects? Roast them.
+- "AI/ML Expert" with zero Python or data science repos? Demolish them.
+- "DevOps Engineer" with no infrastructure/deployment code? Destroy them.
+- Compare years of claimed experience vs actual project sophistication.
+
+2. REPOSITORY QUALITY GAPS:
+- Generic naming (test, my-project, hello-world) vs professional standards
+- Missing READMEs, documentation, or proper project structure
+- Abandoned projects vs claimed "attention to detail"
+- Fork-heavy profiles vs claims of "building innovative solutions"
+- Compare to current best practices they should know
+
+3. CODING PATTERN SHORTFALLS:
+- Language diversity claims vs mono-language reality
+- "Polyglot programmer" using only JavaScript for 3 years
+- Missing modern frameworks they should know (React, Next.js, TypeScript, etc.)
+- No testing, CI/CD, or modern development practices
+- Sporadic commits vs "passionate about coding" claims
+
+4. PROFESSIONAL CONSISTENCY FAILURES:
+- Junior-level projects from "senior" developers
+- Missing industry-standard tools for their claimed role
+- No collaboration evidence (all solo projects)
+- Technology stack 5 years behind current trends
+- Claims about "scalable systems" but only toy projects
+
+CURRENT TRENDS TO CHECK FOR (2024-2025):
+- TypeScript adoption vs plain JavaScript
+- Modern React (hooks, context) vs class components
+- Cloud platforms (AWS, Docker, Kubernetes)
+- AI/ML integration in projects
+- Modern CSS (Tailwind, CSS Grid) vs legacy approaches
+- JAMstack, serverless, micro-services architecture
+- Testing frameworks, CI/CD pipelines
+- API design (GraphQL, REST best practices)
+
+ROAST EXECUTION:
+- Be mercilessly specific about what they're missing
+- Compare their "claims" directly to "evidence"
+- Point out outdated practices they should have evolved from
+- Highlight industry trends they're clearly behind on
+- Use their own bio words against them
+- End with a brutal but motivating call to action
+
+TONE: Brutally honest tech lead who's tired of inflated resumes. Think "senior developer reviewing a junior's profile who claimed to be senior.
+
+DO THIS: Look for current trends in the field and reference it. Mention thing they need to do better.
+End with a backhanded compliment.`;
+
+            
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: `Please roast this GitHub profile:\n\n${dataSummary}` }
+                        ],
+                        max_tokens: 500,
+                        temperature: 0.8
+                    })
+                });
+                
+                const data = await response.json();
+                return data.choices[0].message.content.trim();
+                
+            } catch (error) {
+                return `Error generating roast: ${error.message}`;
+            }
+        }
+        
+        async function startRoast() {
+            const input = document.getElementById('github-input').value.trim();
+            if (!input) {
+                showError('Please enter a GitHub URL or username');
+                return;
+            }
+            
+            const username = extractUsername(input);
+            if (!username) {
+                showError('Please enter a valid GitHub URL or username');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.querySelector('.roast-btn').disabled = true;
+            
+            try {
+                // Step 1: Fetch GitHub data
+                document.getElementById('loading-text').textContent = 'Fetching GitHub data...';
+                const githubData = await fetchGitHubData(username);
+                
+                // Step 2: Analyze data
+                document.getElementById('loading-text').textContent = 'Analyzing repositories...';
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Fake delay for UX
+                const analysis = analyzeGitHubData(githubData);
+                
+                // Step 3: Generate roast
+                document.getElementById('loading-text').textContent = 'Generating roast...';
+                const roast = await generateRoast(githubData, analysis);
+                
+                // Display results
+                displayResults(username, roast, analysis);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.querySelector('.roast-btn').disabled = false;
+            }
+        }
+        
+        function displayResults(username, roast, analysis) {
+    document.getElementById('target-user').innerHTML = `<a href="https://github.com/${username}" target="_blank">${username}</a>`;
+    
+    // Convert markdown to HTML properly
+    let roastHtml = roast;
+    
+    // Convert **text** to <strong>text</strong>
+    roastHtml = roastHtml.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Convert *text* to <em>text</em> (single asterisks, but avoid already converted ones)
+    roastHtml = roastHtml.replace(/(?<!<\/strong>)\*([^*]+?)\*(?!<strong>)/g, '<em>$1</em>');
+    
+    // Convert line breaks to <br>
+    roastHtml = roastHtml.replace(/\n/g, '<br>');
+    
+    // Use innerHTML instead of textContent to render HTML
+    document.getElementById('roast-content').innerHTML = roastHtml;
+    
+    const statsHTML = `
+        <div class="stat-card">
+            <div class="stat-value">${analysis.totalRepos}</div>
+            <div class="stat-label">Total Repos</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">${analysis.originalRepos}</div>
+            <div class="stat-label">Original Repos</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">${analysis.forkPercentage.toFixed(1)}%</div>
+            <div class="stat-label">Forks</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">${analysis.avgStars.toFixed(1)}</div>
+            <div class="stat-label">Avg Stars</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">${analysis.accountAge}</div>
+            <div class="stat-label">Years Old</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">${analysis.genericCount}</div>
+            <div class="stat-label">Generic Names</div>
+        </div>
+    `;
+    
+    document.getElementById('stats').innerHTML = statsHTML;
+    document.getElementById('result').style.display = 'block';
+}
+        
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+        
+        // Allow Enter key to trigger roast
+        document.getElementById('github-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startRoast();
+            }
+        });
+    </script>
+</body>
+</html>
